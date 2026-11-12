@@ -1,488 +1,442 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="theme-color" content="#3B8780">
-
+    <meta name="theme-color" content="#0D5C5C">
     <title>Clinic Resource Tracker</title>
-
     <link rel="stylesheet" href="/styles.css">
     <link rel="manifest" href="/manifest.json">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-
-<div class="dashboard">
-
-    <!-- ================= HERO HEADER ================= -->
-
-    <header class="hero">
-
-        <div class="hero-content">
-
-            <div class="system-label">
-                <span class="live-dot"></span>
-                Clinic Resource Management System
+<div class="app-container">
+    
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+            <div class="brand-text">
+                <h2>Clinic<br>Resource<br>Tracker</h2>
             </div>
+        </div>
 
-            <h1>Hello, Clinic Team 👋</h1>
+        <nav class="sidebar-nav">
+            <button class="nav-btn active" data-target="view-dashboard">
+                <i class="fa-solid fa-house"></i> Dashboard
+            </button>
+            <button class="nav-btn" data-target="view-inventory">
+                <i class="fa-solid fa-box"></i> Inventory
+            </button>
+            <button class="nav-btn" data-target="view-movements">
+                <i class="fa-solid fa-arrow-right-arrow-left"></i> Stock Movement
+            </button>
+            <button class="nav-btn" data-target="view-reports">
+                <i class="fa-solid fa-chart-simple"></i> Reports & Analytics
+            </button>
+            <button class="nav-btn" data-target="view-sync">
+                <i class="fa-solid fa-rotate"></i> Sync Activity
+            </button>
+            <button class="nav-btn" data-target="view-sync">
+                <i class="fa-solid fa-triangle-exclamation"></i> Conflict Log
+            </button>
+            <button class="nav-btn" data-target="view-settings">
+                <i class="fa-solid fa-gear"></i> Settings
+            </button>
+        </nav>
 
-            <p>
-                Monitor clinic resources, manage supplies and track
-                inventory locations. Keep your records synchronized
-                from one centralized dashboard.
-            </p>
-
-            <div class="hero-bottom">
-
-                <div id="status-bar">
-
-                    <span id="network-status"
-                          class="badge offline">
-                        Offline
-                    </span>
-
-                    <span id="pending-count"
-                          class="badge pending">
-                        0 Pending
-                    </span>
-
+        <div class="sidebar-footer">
+            <div class="connection-status">
+                <div class="status-dot" id="sidebar-network-dot"></div>
+                <div>
+                    <strong id="sidebar-network-text">Online</strong>
+                    <p id="sidebar-last-sync">Last sync: Just now</p>
                 </div>
-
-                <button id="sync-btn" class="sync-btn">
-                    ↻ Sync Now
-                </button>
-
-                <span class="hero-stat">
-                    <span class="stat-dot"></span>
-                    Clinic Inventory Management
-                </span>
-
             </div>
-
         </div>
-
-        <div class="hero-decoration">
-            <div class="hero-ring"></div>
-            <div class="hero-cross">+</div>
-            <div class="hero-pill"></div>
-        </div>
-
-    </header>
-
+    </aside>
 
     <!-- ================= MAIN CONTENT ================= -->
-
-    <main>
-
-        <!-- TOP GRID -->
-
-        <div class="top-grid">
-
-
-            <!-- INVENTORY OVERVIEW -->
-
-            <section class="inventory-panel">
-
-                <div class="panel-heading">
-
-                    <div>
-                        <span class="eyebrow">
-                            RESOURCE MANAGEMENT
-                        </span>
-
-                        <h2>Inventory Overview</h2>
-
-                        <p>
-                            View and manage your registered clinic supplies.
-                        </p>
-                    </div>
-
-                    <div class="panel-icon">
-                        ▦
-                    </div>
-
+    <main class="main-content">
+        
+        <!-- TOP HEADER -->
+        <header class="top-header">
+            <div class="header-left">
+                <i class="fa-solid fa-bars menu-toggle"></i>
+            </div>
+            <div class="header-right">
+                <div class="notification-icon">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge-dot">2</span>
                 </div>
-
-
-                <!-- INVENTORY LEGEND -->
-
-                <div class="inventory-legend">
-
-                    <span>
-                        <i class="dot synced-dot"></i>
-                        Synchronized
-                    </span>
-
-                    <span>
-                        <i class="dot pending-dot"></i>
-                        Pending
-                    </span>
-
-                    <span>
-                        <i class="dot conflict-dot"></i>
-                        Conflicted
-                    </span>
-
+                <div class="user-profile">
+                    <div class="avatar">TC</div>
+                    <span>Clinic Team <i class="fa-solid fa-chevron-down" style="font-size:10px; margin-left:5px;"></i></span>
                 </div>
+            </div>
+        </header>
 
-
-                <!-- TABLE HEADER -->
-
-                <div class="table-header">
-
-                    <span>RESOURCE NAME</span>
-                    <span>QUANTITY</span>
-                    <span>LOCATION</span>
-                    <span>STATUS / ACTIONS</span>
-
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="view active">
+            
+            <!-- HERO SECTION -->
+            <section class="hero">
+                <div class="hero-content">
+                    <span class="hero-label"><span class="dot"></span> Clinic Resource Management System</span>
+                    <h1>Good Morning, Clinic Team 👋</h1>
+                    <p>Manage supplies, monitor inventory and synchronize records from one centralized dashboard.</p>
                 </div>
-
-
-                <!-- DYNAMIC INVENTORY -->
-
-                <div class="inventory-scroll">
-
-                    <ul id="list-container"></ul>
-
+                <div class="hero-actions">
+                    <span id="network-status" class="badge online">Online</span>
+                    <span id="pending-count" class="badge pending">0 Pending</span>
+                    <button id="sync-btn" class="btn-sync"><i class="fa-solid fa-rotate"></i> Sync Now</button>
                 </div>
-
-
-                <div class="inventory-footer">
-
-                    <span>
-                        <i class="footer-dot"></i>
-                        Clinic inventory records
-                    </span>
-
-                    <span>
-                        Offline-first synchronization
-                    </span>
-
+                <div class="hero-bg-icons">
+                    <i class="fa-solid fa-plus bg-cross"></i>
+                    <i class="fa-solid fa-pills bg-pill"></i>
                 </div>
-
             </section>
 
-
-            <!-- RIGHT SIDEBAR -->
-
-            <aside class="right-panel">
-
-
-                <!-- SYSTEM STATUS -->
-
-                <section class="system-panel">
-
-                    <div class="side-heading">
-
-                        <div class="side-icon teal-icon">
-                            ✓
+            <!-- MIDDLE GRID -->
+            <div class="dashboard-grid">
+                
+                <!-- INVENTORY TABLE PANEL -->
+                <section class="panel inventory-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="icon-box teal"><i class="fa-solid fa-boxes-stacked"></i></div>
+                            <div>
+                                <h2>Inventory Overview</h2>
+                                <p>Monitor and manage your registered clinic supplies.</p>
+                            </div>
                         </div>
-
-                        <div>
-                            <h3>System Status</h3>
-                            <p>Resource tracking overview</p>
+                        <div class="panel-filters">
+                            <div class="search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="search-input" placeholder="Search supplies...">
+                            </div>
+                            <button class="btn-filter"><i class="fa-solid fa-filter"></i> Filter</button>
                         </div>
-
                     </div>
 
-
-                    <div class="status-card">
-
-                        <div class="status-icon">
-                            ◉
-                        </div>
-
-                        <div>
-                            <strong>Network Connection</strong>
-                            <p>Online and offline monitoring</p>
-                        </div>
-
+                    <div class="table-wrapper">
+                        <table class="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>RESOURCE NAME</th>
+                                    <th>QUANTITY</th>
+                                    <th>LOCATION</th>
+                                    <th>STATUS</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-container">
+                                <!-- Dynamic Rows injected by JS -->
+                            </tbody>
+                        </table>
                     </div>
-
-
-                    <div class="status-card">
-
-                        <div class="status-icon blue-icon">
-                            ↻
-                        </div>
-
-                        <div>
-                            <strong>Data Synchronization</strong>
-                            <p>Local and remote records</p>
-                        </div>
-
+                    
+                    <div class="panel-footer">
+                        <span id="total-items-text"><i class="fa-solid fa-circle" style="color:var(--success); font-size:8px; margin-right:5px;"></i> 0 items in inventory</span>
+                        <span id="last-updated-text">Last updated: Just now <i class="fa-solid fa-rotate"></i></span>
                     </div>
-
-
-                    <div class="status-card">
-
-                        <div class="status-icon gold-icon">
-                            ▦
-                        </div>
-
-                        <div>
-                            <strong>Inventory Management</strong>
-                            <p>Centralized supply records</p>
-                        </div>
-
-                    </div>
-
-
-                    <div class="system-note">
-                        Your clinic resources are organized
-                        in one centralized workspace.
-                    </div>
-
                 </section>
 
-
-                <!-- QUICK GUIDE -->
-
-                <section class="guide-panel">
-
-                    <div class="side-heading">
-
-                        <div class="side-icon lavender-icon">
-                            ✦
+                <!-- RIGHT SIDE PANEL -->
+                <aside class="right-sidebar">
+                    
+                    <!-- SYSTEM STATUS -->
+                    <section class="panel status-panel">
+                        <div class="status-header">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                            <div>
+                                <h2>System Status</h2>
+                                <p>Real-time overview</p>
+                            </div>
+                        </div>
+                        
+                        <div class="status-row">
+                            <div class="status-icon"><i class="fa-solid fa-wifi"></i></div>
+                            <div class="status-info">
+                                <strong>Network Connection</strong>
+                                <p>Stable connection</p>
+                            </div>
+                            <span id="status-network-badge" class="badge success">Online</span>
                         </div>
 
-                        <div>
-                            <h3>Quick Guide</h3>
-                            <p>Getting started</p>
+                        <div class="status-row">
+                            <div class="status-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+                            <div class="status-info">
+                                <strong>Data Synchronization</strong>
+                                <p>No pending changes</p>
+                            </div>
+                            <span id="status-sync-badge" class="badge info">Up to date</span>
                         </div>
 
-                    </div>
+                        <div class="status-row">
+                            <div class="status-icon"><i class="fa-solid fa-database"></i></div>
+                            <div class="status-info">
+                                <strong>Inventory Database</strong>
+                                <p>All systems operational</p>
+                            </div>
+                            <span class="badge success">Healthy</span>
+                        </div>
+                    </section>
 
+                    <!-- QUICK GUIDE -->
+                    <section class="panel guide-panel">
+                        <div class="guide-header">
+                            <div class="icon-box gold"><i class="fa-solid fa-lightbulb"></i></div>
+                            <div>
+                                <h2>Quick Guide</h2>
+                                <p>Get started quickly</p>
+                            </div>
+                        </div>
+                        <div class="guide-list">
+                            <div class="guide-item"><span class="num">1</span> Add new supplies</div>
+                            <div class="guide-item"><span class="num">2</span> Update quantities</div>
+                            <div class="guide-item"><span class="num">3</span> Sync changes</div>
+                        </div>
+                    </section>
+                </aside>
+            </div>
 
-                    <div class="guide-item">
-                        <span>01</span>
-                        Add new clinic supplies.
-                    </div>
-
-                    <div class="guide-item">
-                        <span>02</span>
-                        Record quantities and locations.
-                    </div>
-
-                    <div class="guide-item">
-                        <span>03</span>
-                        Synchronize changes when online.
-                    </div>
-
-                </section>
-
-            </aside>
-
-        </div>
-
-
-        <!-- ================= BOTTOM CARDS ================= -->
-
-        <div class="bottom-grid">
-
-
-            <!-- ADD SUPPLY -->
-
-            <section class="bottom-card add-card">
-
-                <div class="bottom-card-heading">
-
-                    <div class="bottom-icon add-icon">
-                        +
-                    </div>
-
-                    <div>
-                        <h2>Add New Supply</h2>
+            <!-- BOTTOM CARDS -->
+            <div class="bottom-cards">
+                
+                <!-- ADD SUPPLY CARD -->
+                <div class="action-card card-teal">
+                    <div class="action-icon"><i class="fa-solid fa-plus"></i></div>
+                    <div class="action-content">
+                        <h3>Add New Supply</h3>
                         <p>Register a clinic resource</p>
+                        <button class="btn-action" onclick="document.getElementById('add-modal').style.display='flex'">
+                            <i class="fa-solid fa-plus"></i> Add Supply <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
-
+                    <i class="fa-solid fa-cubes bg-icon"></i>
                 </div>
 
-
-                <form id="supply-form">
-
-                    <div class="form-group">
-
-                        <label for="name">Item Name</label>
-
-                        <input
-                            type="text"
-                            id="name"
-                            placeholder="e.g. Surgical Gloves"
-                            required
-                        >
-
+                <!-- RESOURCE GUIDE CARD -->
+                <div class="action-card card-blue">
+                    <div class="action-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div class="action-content">
+                        <h3>Resource Management</h3>
+                        <p>Learn how to manage inventory</p>
+                        <button class="btn-action" onclick="alert('Guide: 1. Add Supply. 2. Update Quantities. 3. Sync!')">
+                            View Guide <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
-
-
-                    <div class="form-row">
-
-                        <div class="form-group">
-
-                            <label for="qty">Quantity</label>
-
-                            <input
-                                type="number"
-                                id="qty"
-                                min="1"
-                                placeholder="Quantity"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label for="location">Location</label>
-
-                            <input
-                                type="text"
-                                id="location"
-                                placeholder="e.g. Shelf 3"
-                                required
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <button type="submit" class="add-btn">
-                        + Add Supply
-                    </button>
-
-                </form>
-
-            </section>
-
-
-            <!-- QUICK RESOURCE INFORMATION -->
-
-            <section class="bottom-card resource-card">
-
-                <div class="bottom-card-heading">
-
-                    <div class="bottom-icon resource-icon">
-                        ▦
-                    </div>
-
-                    <div>
-                        <h2>Resource Management</h2>
-                        <p>Inventory management guide</p>
-                    </div>
-
+                    <i class="fa-solid fa-map bg-icon"></i>
                 </div>
 
+                <!-- CONFLICT LOG CARD -->
+                <div class="action-card card-purple">
+                    <div class="action-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="action-content">
+                        <h3>Conflict Log</h3>
+                        <p>Check for data conflicts</p>
+                        <button class="btn-action" onclick="document.querySelector('[data-target=\'view-sync\']').click()">
+                            View Logs <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <i class="fa-solid fa-clock-rotate-left bg-icon"></i>
+                </div>
+            </div>
 
-                <div class="resource-info">
+        </div> <!-- End Dashboard View -->
 
-                    <div>
-                        <span class="resource-number">01</span>
-
+        <!-- INVENTORY VIEW -->
+        <div id="view-inventory" class="view">
+             <section class="panel" style="margin-top:20px;">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <div class="icon-box teal"><i class="fa-solid fa-box"></i></div>
                         <div>
-                            <strong>Register Supplies</strong>
-                            <p>Keep a record of clinic resources.</p>
+                            <h2>Full Inventory Management</h2>
+                            <p>All registered clinic resources</p>
                         </div>
                     </div>
-
-                    <div>
-                        <span class="resource-number">02</span>
-
-                        <div>
-                            <strong>Update Inventory</strong>
-                            <p>Maintain accurate quantities and locations.</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <span class="resource-number">03</span>
-
-                        <div>
-                            <strong>Synchronize Records</strong>
-                            <p>Keep changes updated across devices.</p>
-                        </div>
-                    </div>
-
                 </div>
-
+                <div class="table-wrapper">
+                    <table class="inventory-table">
+                        <thead>
+                            <tr><th>NAME</th><th>CATEGORY</th><th>QTY</th><th>LOCATION</th><th>SYNC STATUS</th></tr>
+                        </thead>
+                        <tbody id="inventory-full-list"></tbody>
+                    </table>
+                </div>
             </section>
-
-
-            <!-- CONFLICT LOG -->
-
-            <section class="bottom-card conflict-card">
-
-                <div class="bottom-card-heading">
-
-                    <div class="bottom-icon conflict-icon">
-                        !
-                    </div>
-
-                    <div>
-                        <h2>Conflict Log</h2>
-                        <p>Synchronization monitoring</p>
-                    </div>
-
-                </div>
-
-
-                <div class="conflict-content">
-
-                    <div class="conflict-check">
-                        ✓
-                    </div>
-
-                    <div>
-                        <strong>Data Integrity Monitor</strong>
-
-                        <div id="conflict-container">
-                            No conflicts detected.
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <div class="conflict-footer">
-                    <i class="footer-dot"></i>
-                    Monitoring inventory changes
-                </div>
-
-            </section>
-
-
         </div>
 
+        <!-- STOCK MOVEMENT VIEW -->
+        <div id="view-movements" class="view">
+            <div class="form-panel" style="margin-top:20px;">
+                <div class="panel-header" style="border-bottom: none;">
+                    <div class="panel-title">
+                        <div class="icon-box teal"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+                        <div>
+                            <h2>Record Stock Movement</h2>
+                            <p>Log incoming or outgoing supplies</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="movement-form">
+                    <div class="input-group">
+                        <label>Select Item</label>
+                        <select id="movement-item"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>Movement Type</label>
+                        <select id="movement-type">
+                            <option value="received">Received (+)</option>
+                            <option value="issued">Issued (-)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Quantity</label>
+                        <input type="number" id="movement-qty" placeholder="0" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label>&nbsp;</label>
+                        <button id="btn-record-movement" class="btn-sync" style="background: var(--primary); color: white; justify-content: center; height: 41px; width: 100%;">
+                            <i class="fa-solid fa-check"></i> Record
+                        </button>
+                    </div>
+                </div>
 
-        <!-- FOOTER -->
+                <div class="movement-history-list">
+                    <h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-muted); padding-left: 5px;">Recent Movements</h3>
+                    <div id="movement-history-container"></div>
+                </div>
+            </div>
+        </div>
 
-        <footer class="dashboard-footer">
+        <!-- REPORTS VIEW -->
+        <div id="view-reports" class="view">
+            <section class="panel" style="margin-top:20px;">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <div class="icon-box teal"><i class="fa-solid fa-chart-simple"></i></div>
+                        <div>
+                            <h2>Reports & Analytics</h2>
+                            <p>Real-time inventory summary</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="report-cards" id="report-summary" style="padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;"></div>
+                <div style="padding: 0 20px 20px 20px; display:flex; gap:10px;">
+                    <button onclick="window.exportCSV()" class="btn-sync" style="background:var(--primary);"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+                    <button onclick="window.print()" class="btn-sync" style="background:var(--blue);"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+                </div>
+            </section>
+        </div>
 
-            <strong>Clinic Resource Tracker</strong>
+        <!-- SYNC VIEW -->
+        <div id="view-sync" class="view">
+            <div class="dashboard-grid" style="margin-top:20px;">
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="icon-box teal"><i class="fa-solid fa-rotate"></i></div>
+                            <div>
+                                <h2>Pending Operations (FIFO Queue)</h2>
+                                <p>Operations waiting to be acknowledged by the server</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="pending-queue" class="queue-box">
+                        Queue is empty.
+                    </div>
+                </section>
+                
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="icon-box gold"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div>
+                                <h2>Conflict Logs</h2>
+                                <p>Records rejected by Last-Write-Wins</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="full-conflict-container" style="padding: 20px;">
+                        No conflicts detected.
+                    </div>
+                </section>
+            </div>
+        </div>
 
-            <span>
-                Secure · Reliable · Offline-First
-            </span>
-
-        </footer>
+        <!-- SETTINGS VIEW -->
+        <div id="view-settings" class="view">
+            <section class="panel" style="margin-top:20px; max-width:500px;">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <div class="icon-box teal"><i class="fa-solid fa-gear"></i></div>
+                        <div>
+                            <h2>Clinic Settings</h2>
+                            <p>Configure your device preferences</p>
+                        </div>
+                    </div>
+                </div>
+                <form id="settings-form" style="display:flex; flex-direction:column; gap:15px; padding:20px;">
+                    <div class="input-group">
+                        <label>Clinic Name</label>
+                        <input type="text" id="clinic-name">
+                    </div>
+                    <div class="input-group">
+                        <label>Default Location</label>
+                        <input type="text" id="default-location">
+                    </div>
+                    <button type="submit" class="btn-sync" style="background:var(--primary); justify-content: center;">Save Settings</button>
+                </form>
+            </section>
+        </div>
 
     </main>
-
 </div>
 
+<!-- ADD SUPPLY MODAL -->
+<div id="add-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Supply</h2>
+            <button onclick="document.getElementById('add-modal').style.display='none'" class="close-btn">&times;</button>
+        </div>
+        <form id="supply-form">
+            <div class="input-group">
+                <label>Item Name</label>
+                <input type="text" id="name" placeholder="e.g. Surgical Gloves" required>
+            </div>
+            <div class="input-group">
+                <label>Category</label>
+                <select id="category" required>
+                    <option value="consumable">Consumable</option>
+                    <option value="vaccine">Vaccine</option>
+                    <option value="equipment">Equipment</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Quantity</label>
+                    <input type="number" id="qty" min="1" placeholder="Qty" required>
+                </div>
+                <div class="input-group">
+                    <label>Location</label>
+                    <input type="text" id="location" placeholder="e.g. Shelf 3" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-sync" style="width:100%; margin-top:15px; justify-content: center; background: var(--primary);">Save Record</button>
+        </form>
+    </div>
+</div>
 
 <script type="module" src="/app.js"></script>
-
 </body>
 </html>

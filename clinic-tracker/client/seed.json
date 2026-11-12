@@ -1,5 +1,6 @@
 [
-  { "name": "Surgical Gloves (M)", "quantity": 40, "location": "Shelf 3", "category": "consumable" },
-  { "name": "Measles Vaccine", "quantity": 120, "location": "Fridge A", "expiry": "2026-03-01", "category": "vaccine" },
-  { "name": "Disposable Syringes", "quantity": 200, "location": "Shelf 1", "category": "consumable" }
+  { "name": "Surgical Gloves", "quantity": 40, "location": "Shelf 3", "category": "consumable" },
+  { "name": "Disposable Syringes", "quantity": 200, "location": "Shelf 1", "category": "consumable" },
+  { "name": "Measles Vaccine", "quantity": 120, "location": "Fridge A", "category": "vaccine" },
+  { "name": "Paracetamol 500mg", "quantity": 100, "location": "Pharmacy", "category": "consumable" }
 ]
