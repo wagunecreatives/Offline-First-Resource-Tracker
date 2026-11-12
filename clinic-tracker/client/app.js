@@ -74,6 +74,60 @@ async function handleCreate(e) {
     triggerSync(db, refreshUI);
 }
 
+// ---------- NEW: Delete handler (tombstone) ----------
+async function handleDelete(id) {
+    const records = await getRecords(db);
+    const record = records.find(r => r.id === id);
+    if (!record) return;
+
+    // Tombstone logic
+    record._deletedAt = Date.now();
+    record._syncStatus = 'pending';
+    record._localVersion = String(Number(record._localVersion) + 1);
+    record._lastModified = Date.now();
+
+    const op = {
+        operationId: crypto.randomUUID(),
+        recordId: record.id,
+        type: 'delete',
+        payload: { _deletedAt: record._deletedAt },
+        baseVersion: record._localVersion,
+        createdAt: Date.now(),
+        status: 'pending'
+    };
+
+    await saveRecordAndEnqueue(db, record, op);
+    refreshUI();
+    triggerSync(db, refreshUI);
+}
+
+// ---------- NEW: Update handler ----------
+async function handleUpdate(id, newQuantity) {
+    const records = await getRecords(db);
+    const record = records.find(r => r.id === id);
+    if (!record) return;
+
+    record.quantity = newQuantity;
+    record._syncStatus = 'pending';
+    record._localVersion = String(Number(record._localVersion) + 1);
+    record._lastModified = Date.now();
+
+    const op = {
+        operationId: crypto.randomUUID(),
+        recordId: record.id,
+        type: 'update',
+        payload: record, // Sending full payload for simplicity
+        baseVersion: String(Number(record._localVersion) - 1),
+        createdAt: Date.now(),
+        status: 'pending'
+    };
+
+    await saveRecordAndEnqueue(db, record, op);
+    refreshUI();
+    triggerSync(db, refreshUI);
+}
+
+// ---------- UPDATED: refreshUI with Edit + Delete buttons ----------
 async function refreshUI() {
     updateNetworkStatus();
     
@@ -82,13 +136,19 @@ async function refreshUI() {
     
     const records = await getRecords(db);
     const list = document.getElementById('list-container');
+    
+    // Add Edit and Delete buttons
     list.innerHTML = records.map(r => `
         <li>
             <div>
                 <strong>${r.name}</strong> - ${r.quantity} units (${r.location})
                 <br><small style="color:gray">ID: ${r.id.substring(0,8)}...</small>
             </div>
-            <span class="badge ${r._syncStatus}">${r._syncStatus}</span>
+            <div>
+                <span class="badge ${r._syncStatus}" style="margin-right: 10px;">${r._syncStatus}</span>
+                <button onclick="window.editQty('${r.id}', ${r.quantity})" style="background: #ff9800;">Edit</button>
+                <button onclick="window.delItem('${r.id}')" style="background: #f44336;">Del</button>
+            </div>
         </li>
     `).join('');
 
@@ -117,5 +177,19 @@ function updateNetworkStatus() {
         el.className = 'badge offline';
     }
 }
+
+// Expose functions to window for the inline HTML buttons
+window.editQty = (id, currentQty) => {
+    const newQty = prompt("Enter new quantity:", currentQty);
+    if (newQty !== null && !isNaN(newQty)) {
+        handleUpdate(id, parseInt(newQty));
+    }
+};
+
+window.delItem = (id) => {
+    if (confirm("Delete this item?")) {
+        handleDelete(id);
+    }
+};
 
 init();
