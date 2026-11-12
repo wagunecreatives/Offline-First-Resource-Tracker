@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Resource Tracker</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <header>
+        <h1>Clinic Resource Tracker</h1>
+        <div id="status-bar">
+            <span id="network-status" class="badge offline">Offline</span>
+            <span id="pending-count" class="badge pending">0 Pending</span>
+            <button id="sync-btn">Sync Now</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="add-supply">
+            <h2>Add Supply</h2>
+            <form id="supply-form">
+                <input type="text" id="name" placeholder="Item Name (e.g., Surgical Gloves)" required>
+                <input type="number" id="qty" placeholder="Quantity" min="1" required>
+                <input type="text" id="location" placeholder="Location (e.g., Shelf 3)" required>
+                <button type="submit">Add</button>
+            </form>
+        </section>
+
+        <section class="supply-list">
+            <h2>Current Inventory</h2>
+            <ul id="list-container"></ul>
+        </section>
+
+        <section class="conflict-log">
+            <h2>Conflict Log</h2>
+            <div id="conflict-container">No conflicts detected.</div>
+        </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+</body>
+</html>
