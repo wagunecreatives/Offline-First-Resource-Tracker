@@ -1,44 +1,488 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#3B8780">
+
     <title>Clinic Resource Tracker</title>
+
     <link rel="stylesheet" href="/styles.css">
     <link rel="manifest" href="/manifest.json">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
 </head>
+
 <body>
-    <header>
-        <h1>Clinic Resource Tracker</h1>
-        <div id="status-bar">
-            <span id="network-status" class="badge offline">Offline</span>
-            <span id="pending-count" class="badge pending">0 Pending</span>
-            <button id="sync-btn">Sync Now</button>
+
+<div class="dashboard">
+
+    <!-- ================= HERO HEADER ================= -->
+
+    <header class="hero">
+
+        <div class="hero-content">
+
+            <div class="system-label">
+                <span class="live-dot"></span>
+                Clinic Resource Management System
+            </div>
+
+            <h1>Good Morning, Clinic Team 👋</h1>
+
+            <p>
+                Monitor clinic resources, manage supplies and track
+                inventory locations. Keep your records synchronized
+                from one centralized dashboard.
+            </p>
+
+            <div class="hero-bottom">
+
+                <div id="status-bar">
+
+                    <span id="network-status"
+                          class="badge offline">
+                        Offline
+                    </span>
+
+                    <span id="pending-count"
+                          class="badge pending">
+                        0 Pending
+                    </span>
+
+                </div>
+
+                <button id="sync-btn" class="sync-btn">
+                    ↻ Sync Now
+                </button>
+
+                <span class="hero-stat">
+                    <span class="stat-dot"></span>
+                    Clinic Inventory Management
+                </span>
+
+            </div>
+
         </div>
+
+        <div class="hero-decoration">
+            <div class="hero-ring"></div>
+            <div class="hero-cross">+</div>
+            <div class="hero-pill"></div>
+        </div>
+
     </header>
 
+
+    <!-- ================= MAIN CONTENT ================= -->
+
     <main>
-        <section class="add-supply">
-            <h2>Add Supply</h2>
-            <form id="supply-form">
-                <input type="text" id="name" placeholder="Item Name (e.g., Surgical Gloves)" required>
-                <input type="number" id="qty" placeholder="Quantity" min="1" required>
-                <input type="text" id="location" placeholder="Location (e.g., Shelf 3)" required>
-                <button type="submit">Add</button>
-            </form>
-        </section>
 
-        <section class="supply-list">
-            <h2>Current Inventory</h2>
-            <ul id="list-container"></ul>
-        </section>
+        <!-- TOP GRID -->
 
-        <section class="conflict-log">
-            <h2>Conflict Log</h2>
-            <div id="conflict-container">No conflicts detected.</div>
-        </section>
+        <div class="top-grid">
+
+
+            <!-- INVENTORY OVERVIEW -->
+
+            <section class="inventory-panel">
+
+                <div class="panel-heading">
+
+                    <div>
+                        <span class="eyebrow">
+                            RESOURCE MANAGEMENT
+                        </span>
+
+                        <h2>Inventory Overview</h2>
+
+                        <p>
+                            View and manage your registered clinic supplies.
+                        </p>
+                    </div>
+
+                    <div class="panel-icon">
+                        ▦
+                    </div>
+
+                </div>
+
+
+                <!-- INVENTORY LEGEND -->
+
+                <div class="inventory-legend">
+
+                    <span>
+                        <i class="dot synced-dot"></i>
+                        Synchronized
+                    </span>
+
+                    <span>
+                        <i class="dot pending-dot"></i>
+                        Pending
+                    </span>
+
+                    <span>
+                        <i class="dot conflict-dot"></i>
+                        Conflicted
+                    </span>
+
+                </div>
+
+
+                <!-- TABLE HEADER -->
+
+                <div class="table-header">
+
+                    <span>RESOURCE NAME</span>
+                    <span>QUANTITY</span>
+                    <span>LOCATION</span>
+                    <span>STATUS / ACTIONS</span>
+
+                </div>
+
+
+                <!-- DYNAMIC INVENTORY -->
+
+                <div class="inventory-scroll">
+
+                    <ul id="list-container"></ul>
+
+                </div>
+
+
+                <div class="inventory-footer">
+
+                    <span>
+                        <i class="footer-dot"></i>
+                        Clinic inventory records
+                    </span>
+
+                    <span>
+                        Offline-first synchronization
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- RIGHT SIDEBAR -->
+
+            <aside class="right-panel">
+
+
+                <!-- SYSTEM STATUS -->
+
+                <section class="system-panel">
+
+                    <div class="side-heading">
+
+                        <div class="side-icon teal-icon">
+                            ✓
+                        </div>
+
+                        <div>
+                            <h3>System Status</h3>
+                            <p>Resource tracking overview</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="status-card">
+
+                        <div class="status-icon">
+                            ◉
+                        </div>
+
+                        <div>
+                            <strong>Network Connection</strong>
+                            <p>Online and offline monitoring</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="status-card">
+
+                        <div class="status-icon blue-icon">
+                            ↻
+                        </div>
+
+                        <div>
+                            <strong>Data Synchronization</strong>
+                            <p>Local and remote records</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="status-card">
+
+                        <div class="status-icon gold-icon">
+                            ▦
+                        </div>
+
+                        <div>
+                            <strong>Inventory Management</strong>
+                            <p>Centralized supply records</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="system-note">
+                        Your clinic resources are organized
+                        in one centralized workspace.
+                    </div>
+
+                </section>
+
+
+                <!-- QUICK GUIDE -->
+
+                <section class="guide-panel">
+
+                    <div class="side-heading">
+
+                        <div class="side-icon lavender-icon">
+                            ✦
+                        </div>
+
+                        <div>
+                            <h3>Quick Guide</h3>
+                            <p>Getting started</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="guide-item">
+                        <span>01</span>
+                        Add new clinic supplies.
+                    </div>
+
+                    <div class="guide-item">
+                        <span>02</span>
+                        Record quantities and locations.
+                    </div>
+
+                    <div class="guide-item">
+                        <span>03</span>
+                        Synchronize changes when online.
+                    </div>
+
+                </section>
+
+            </aside>
+
+        </div>
+
+
+        <!-- ================= BOTTOM CARDS ================= -->
+
+        <div class="bottom-grid">
+
+
+            <!-- ADD SUPPLY -->
+
+            <section class="bottom-card add-card">
+
+                <div class="bottom-card-heading">
+
+                    <div class="bottom-icon add-icon">
+                        +
+                    </div>
+
+                    <div>
+                        <h2>Add New Supply</h2>
+                        <p>Register a clinic resource</p>
+                    </div>
+
+                </div>
+
+
+                <form id="supply-form">
+
+                    <div class="form-group">
+
+                        <label for="name">Item Name</label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="e.g. Surgical Gloves"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label for="qty">Quantity</label>
+
+                            <input
+                                type="number"
+                                id="qty"
+                                min="1"
+                                placeholder="Quantity"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="location">Location</label>
+
+                            <input
+                                type="text"
+                                id="location"
+                                placeholder="e.g. Shelf 3"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="submit" class="add-btn">
+                        + Add Supply
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <!-- QUICK RESOURCE INFORMATION -->
+
+            <section class="bottom-card resource-card">
+
+                <div class="bottom-card-heading">
+
+                    <div class="bottom-icon resource-icon">
+                        ▦
+                    </div>
+
+                    <div>
+                        <h2>Resource Management</h2>
+                        <p>Inventory management guide</p>
+                    </div>
+
+                </div>
+
+
+                <div class="resource-info">
+
+                    <div>
+                        <span class="resource-number">01</span>
+
+                        <div>
+                            <strong>Register Supplies</strong>
+                            <p>Keep a record of clinic resources.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="resource-number">02</span>
+
+                        <div>
+                            <strong>Update Inventory</strong>
+                            <p>Maintain accurate quantities and locations.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="resource-number">03</span>
+
+                        <div>
+                            <strong>Synchronize Records</strong>
+                            <p>Keep changes updated across devices.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CONFLICT LOG -->
+
+            <section class="bottom-card conflict-card">
+
+                <div class="bottom-card-heading">
+
+                    <div class="bottom-icon conflict-icon">
+                        !
+                    </div>
+
+                    <div>
+                        <h2>Conflict Log</h2>
+                        <p>Synchronization monitoring</p>
+                    </div>
+
+                </div>
+
+
+                <div class="conflict-content">
+
+                    <div class="conflict-check">
+                        ✓
+                    </div>
+
+                    <div>
+                        <strong>Data Integrity Monitor</strong>
+
+                        <div id="conflict-container">
+                            No conflicts detected.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="conflict-footer">
+                    <i class="footer-dot"></i>
+                    Monitoring inventory changes
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <footer class="dashboard-footer">
+
+            <strong>Clinic Resource Tracker</strong>
+
+            <span>
+                Secure · Reliable · Offline-First
+            </span>
+
+        </footer>
+
     </main>
 
-    <script type="module" src="/app.js"></script>
+</div>
+
+
+<script type="module" src="/app.js"></script>
+
 </body>
 </html>
