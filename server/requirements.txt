@@ -1,0 +1,5 @@
+Flask==3.0.0
+flask-cors==4.0.0
+psycopg[binary]==3.2.13
+psycopg_pool==3.2.1
+gunicorn==21.2.0
