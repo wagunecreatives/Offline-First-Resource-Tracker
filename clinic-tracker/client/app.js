@@ -1,5 +1,5 @@
 import { openDB, getRecords, getConflicts, saveRecordAndEnqueue, getPendingCount } from './db.js';
-import { triggerSync } from './sync.js';
+import { triggerSync, pullFromServer } from './sync.js'; // Added pullFromServer
 
 let db;
 let currentRecords = [];
@@ -28,9 +28,18 @@ async function init() {
     setupNavigation();
     setupForms();
 
-    document.getElementById('sync-btn').addEventListener('click', () => triggerSync(db, refreshUI));
+    // --- UPDATED: SYNC BUTTON (PUSH THEN PULL) ---
+    document.getElementById('sync-btn').addEventListener('click', async () => {
+        await triggerSync(db, refreshUI);
+        await pullFromServer(db, refreshUI);
+    });
     
-    window.addEventListener('online', () => { updateNetworkStatus(); triggerSync(db, refreshUI); });
+    // --- UPDATED: ONLINE EVENT (PUSH THEN PULL) ---
+    window.addEventListener('online', async () => { 
+        updateNetworkStatus(); 
+        await triggerSync(db, refreshUI); 
+        await pullFromServer(db, refreshUI);
+    });
     window.addEventListener('offline', updateNetworkStatus);
     
     // --- THEME SETUP ---
@@ -51,16 +60,19 @@ async function init() {
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('theme', 'light');
             }
-            // Redraw charts if reports are currently visible to update text colors
             if (document.getElementById('view-reports').classList.contains('active')) {
                 renderReports();
             }
         });
     }
-    // -------------------
 
     loadSettings();
     refreshUI();
+
+    // --- NEW: PULL DATA ON INITIAL LOAD ---
+    if (navigator.onLine) {
+        pullFromServer(db, refreshUI);
+    }
 }
 
 // --- SPA ROUTING ---
@@ -320,23 +332,16 @@ async function renderSyncView() {
 }
 
 function renderReports() {
-    // 1. Calculate Summary Data
     let totalItems = 0;
     let lowStockCount = 0;
     let healthyStockCount = 0;
     const categoryData = { consumable: 0, vaccine: 0, equipment: 0 };
     
-    // Process records
     currentRecords.forEach(r => {
         totalItems += r.quantity;
-        
-        if (r.quantity < 10) {
-            lowStockCount++;
-        } else {
-            healthyStockCount++;
-        }
+        if (r.quantity < 10) lowStockCount++;
+        else healthyStockCount++;
 
-        // Category aggregation
         if (categoryData[r.category] !== undefined) {
             categoryData[r.category] += r.quantity;
         } else {
@@ -344,7 +349,6 @@ function renderReports() {
         }
     });
 
-    // Update Summary Cards
     document.getElementById('report-summary').innerHTML = `
         <div class="panel" style="padding:20px; text-align:center; border: 1px solid var(--border); box-shadow: none; background: var(--bg);">
             <h3 style="color:var(--text-muted); font-size:12px;">Total Units</h3>
@@ -360,18 +364,14 @@ function renderReports() {
         </div>
     `;
 
-    // 2. Prepare Chart.js Data
-    // Destroy existing charts to prevent hover glitches when re-rendering
     if (chartStatus) chartStatus.destroy();
     if (chartCategory) chartCategory.destroy();
     if (chartTrend) chartTrend.destroy();
 
-    // Determine theme colors for charts
     const isDark = document.body.classList.contains('dark-mode');
     const textColor = isDark ? '#94A3B8' : '#64748B';
     const gridColor = isDark ? '#334155' : '#E2E8F0';
 
-    // Chart 1: Doughnut (Stock Health)
     const ctxStatus = document.getElementById('statusChart').getContext('2d');
     chartStatus = new Chart(ctxStatus, {
         type: 'doughnut',
@@ -387,17 +387,11 @@ function renderReports() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { 
-                legend: { 
-                    position: 'bottom',
-                    labels: { color: textColor }
-                } 
-            },
+            plugins: { legend: { position: 'bottom', labels: { color: textColor } } },
             cutout: '70%'
         }
     });
 
-    // Chart 2: Bar (Category Breakdown)
     const ctxCategory = document.getElementById('categoryChart').getContext('2d');
     chartCategory = new Chart(ctxCategory, {
         type: 'bar',
@@ -415,20 +409,12 @@ function renderReports() {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { 
-                    beginAtZero: true, 
-                    grid: { color: gridColor, borderDash: [5, 5] },
-                    ticks: { color: textColor }
-                },
-                x: { 
-                    grid: { display: false },
-                    ticks: { color: textColor }
-                }
+                y: { beginAtZero: true, grid: { color: gridColor, borderDash: [5, 5] }, ticks: { color: textColor } },
+                x: { grid: { display: false }, ticks: { color: textColor } }
             }
         }
     });
 
-    // Chart 3: Line (Usage Trends)
     let trendReceivedData = [0, 0, 0, 0, 0, 0, 0];
     let trendIssuedData = [0, 0, 0, 0, 0, 0, 0];
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -479,22 +465,10 @@ function renderReports() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { 
-                legend: { 
-                    position: 'top',
-                    labels: { color: textColor }
-                } 
-            },
+            plugins: { legend: { position: 'top', labels: { color: textColor } } },
             scales: {
-                y: { 
-                    beginAtZero: true, 
-                    grid: { color: gridColor, borderDash: [5, 5] },
-                    ticks: { color: textColor }
-                },
-                x: { 
-                    grid: { display: false },
-                    ticks: { color: textColor }
-                }
+                y: { beginAtZero: true, grid: { color: gridColor, borderDash: [5, 5] }, ticks: { color: textColor } },
+                x: { grid: { display: false }, ticks: { color: textColor } }
             }
         }
     });
