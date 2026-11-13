@@ -8,7 +8,7 @@ let currentRecords = [];
 const getItemIcon = (name) => {
     const n = name.toLowerCase();
     if (n.includes('glove')) return '<i class="fa-solid fa-hand" style="color:#3B82F6;"></i>';
-    if (n.includes('syringe')) return '<i class="fa-solid fa-syringe" style="color:#10B981;"></i>';
+    if (n.includes('syringe')) return '<i class="fa-solid fa-syringe" style="color:#12B981;"></i>';
     if (n.includes('vaccine')) return '<i class="fa-solid fa-vial" style="color:#F59E0B;"></i>';
     if (n.includes('paracetamol') || n.includes('pill')) return '<i class="fa-solid fa-pills" style="color:#8B5CF6;"></i>';
     return '<i class="fa-solid fa-box" style="color:var(--text-muted);"></i>';
