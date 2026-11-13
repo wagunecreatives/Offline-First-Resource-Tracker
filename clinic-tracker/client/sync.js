@@ -62,7 +62,7 @@ export async function triggerSync(db, onUpdate) {
     }
 }
 
-// --- NEW: PULL FUNCTION ---
+// --- FIXED: PULL FUNCTION ---
 export async function pullFromServer(db, onUpdate) {
     if (!navigator.onLine) return;
     
@@ -73,12 +73,17 @@ export async function pullFromServer(db, onUpdate) {
         const serverRecords = await res.json();
         if (!serverRecords || serverRecords.length === 0) return;
 
-        // 1. Get pending outbox operations to prevent overwriting local unsynced changes
-        const txRead = db.transaction(['outbox'], 'readonly');
-        const pendingOps = await txRead.objectStore('outbox').getAll();
+        // 1. Get pending ops safely using a Promise wrapper
+        const pendingOps = await new Promise((resolve, reject) => {
+            const txRead = db.transaction(['outbox'], 'readonly');
+            const req = txRead.objectStore('outbox').getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+        
         const pendingRecordIds = new Set(pendingOps.map(op => op.recordId));
 
-        // 2. Apply server records to local DB
+        // 2. Apply server records
         const txWrite = db.transaction(['records'], 'readwrite');
         const recordsStore = txWrite.objectStore('records');
 
@@ -86,7 +91,12 @@ export async function pullFromServer(db, onUpdate) {
             // Skip if we have local pending changes for this record
             if (pendingRecordIds.has(serverRec.id)) continue;
             
-            const localRec = await recordsStore.get(serverRec.id);
+            // Get local record safely using a Promise wrapper
+            const localRec = await new Promise((resolve, reject) => {
+                const req = recordsStore.get(serverRec.id);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
             
             // If server has a tombstone (deleted) and local doesn't, mark it deleted locally
             if (serverRec._deletedAt && (!localRec || !localRec._deletedAt)) {
@@ -103,7 +113,12 @@ export async function pullFromServer(db, onUpdate) {
             }
         }
 
-        await txWrite.done;
+        // Wait for the write transaction to finish
+        await new Promise((resolve, reject) => {
+            txWrite.oncomplete = resolve;
+            txWrite.onerror = () => reject(txWrite.error);
+        });
+
         if (onUpdate) onUpdate();
         
     } catch (err) {

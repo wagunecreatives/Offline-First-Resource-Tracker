@@ -1,5 +1,5 @@
 import { openDB, getRecords, getConflicts, saveRecordAndEnqueue, getPendingCount } from './db.js';
-import { triggerSync, pullFromServer } from './sync.js'; // Added pullFromServer
+import { triggerSync, pullFromServer } from './sync.js';
 
 let db;
 let currentRecords = [];
@@ -28,13 +28,13 @@ async function init() {
     setupNavigation();
     setupForms();
 
-    // --- UPDATED: SYNC BUTTON (PUSH THEN PULL) ---
+    // --- SYNC BUTTON (PUSH THEN PULL) ---
     document.getElementById('sync-btn').addEventListener('click', async () => {
         await triggerSync(db, refreshUI);
         await pullFromServer(db, refreshUI);
     });
     
-    // --- UPDATED: ONLINE EVENT (PUSH THEN PULL) ---
+    // --- ONLINE EVENT (PUSH THEN PULL) ---
     window.addEventListener('online', async () => { 
         updateNetworkStatus(); 
         await triggerSync(db, refreshUI); 
@@ -69,10 +69,17 @@ async function init() {
     loadSettings();
     refreshUI();
 
-    // --- NEW: PULL DATA ON INITIAL LOAD ---
+    // --- PULL DATA ON INITIAL LOAD ---
     if (navigator.onLine) {
         pullFromServer(db, refreshUI);
     }
+
+    // --- BACKGROUND POLLING (EVERY 10 SECONDS) ---
+    setInterval(async () => {
+        if (navigator.onLine) {
+            await pullFromServer(db, refreshUI);
+        }
+    }, 10000);
 }
 
 // --- SPA ROUTING ---
