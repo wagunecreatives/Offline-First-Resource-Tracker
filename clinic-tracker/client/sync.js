@@ -62,7 +62,7 @@ export async function triggerSync(db, onUpdate) {
     }
 }
 
-// --- FIXED: PULL FUNCTION ---
+// --- PULL FUNCTION ---
 export async function pullFromServer(db, onUpdate) {
     if (!navigator.onLine) return;
     
