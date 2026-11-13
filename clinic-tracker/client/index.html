@@ -433,27 +433,42 @@
 
         <!-- SETTINGS VIEW -->
         <div id="view-settings" class="view">
-            <section class="panel" style="margin-top:20px; max-width:500px;">
+            <section class="panel" style="margin-top:20px; max-width:600px;">
                 <div class="panel-header">
                     <div class="panel-title">
                         <div class="icon-box teal"><i class="fa-solid fa-gear"></i></div>
                         <div>
-                            <h2>Clinic Settings</h2>
-                            <p>Configure your device preferences</p>
+                            <h2>Users & Settings</h2>
+                            <p>System preferences</p>
                         </div>
                     </div>
                 </div>
-                <form id="settings-form" style="display:flex; flex-direction:column; gap:15px; padding:20px;">
-                    <div class="input-group">
-                        <label>Clinic Name</label>
-                        <input type="text" id="clinic-name">
+                <div style="padding: 20px;">
+                    <!-- Theme Toggle Row -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px;">
+                        <div>
+                            <strong style="font-size: 14px; color: var(--text-main);">Theme Preference</strong>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Toggle between light and dark mode.</p>
+                        </div>
+                        <label class="theme-switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
-                    <div class="input-group">
-                        <label>Default Location</label>
-                        <input type="text" id="default-location">
-                    </div>
-                    <button type="submit" class="btn-sync" style="background:var(--primary); justify-content: center;">Save Settings</button>
-                </form>
+
+                    <!-- Clinic Settings Form -->
+                    <form id="settings-form" style="display:flex; flex-direction:column; gap:15px;">
+                        <div class="input-group">
+                            <label>Clinic Name</label>
+                            <input type="text" id="clinic-name">
+                        </div>
+                        <div class="input-group">
+                            <label>Default Location</label>
+                            <input type="text" id="default-location">
+                        </div>
+                        <button type="submit" class="btn-sync" style="background:var(--primary); justify-content: center; margin-top: 10px;">Save Settings</button>
+                    </form>
+                </div>
             </section>
         </div>
 

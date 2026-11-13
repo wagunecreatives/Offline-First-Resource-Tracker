@@ -33,6 +33,32 @@ async function init() {
     window.addEventListener('online', () => { updateNetworkStatus(); triggerSync(db, refreshUI); });
     window.addEventListener('offline', updateNetworkStatus);
     
+    // --- THEME SETUP ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const currentTheme = localStorage.getItem('theme');
+    
+    if (currentTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (themeToggle) themeToggle.checked = true;
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+            // Redraw charts if reports are currently visible to update text colors
+            if (document.getElementById('view-reports').classList.contains('active')) {
+                renderReports();
+            }
+        });
+    }
+    // -------------------
+
     loadSettings();
     refreshUI();
 }
@@ -320,15 +346,15 @@ function renderReports() {
 
     // Update Summary Cards
     document.getElementById('report-summary').innerHTML = `
-        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0; box-shadow: none;">
+        <div class="panel" style="padding:20px; text-align:center; border: 1px solid var(--border); box-shadow: none; background: var(--bg);">
             <h3 style="color:var(--text-muted); font-size:12px;">Total Units</h3>
             <p style="font-size:28px; font-weight:bold; color:var(--primary); margin-top:5px;">${totalItems}</p>
         </div>
-        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0; box-shadow: none;">
+        <div class="panel" style="padding:20px; text-align:center; border: 1px solid var(--border); box-shadow: none; background: var(--bg);">
             <h3 style="color:var(--text-muted); font-size:12px;">Unique Items</h3>
             <p style="font-size:28px; font-weight:bold; color:var(--blue); margin-top:5px;">${currentRecords.length}</p>
         </div>
-        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0; box-shadow: none;">
+        <div class="panel" style="padding:20px; text-align:center; border: 1px solid var(--border); box-shadow: none; background: var(--bg);">
             <h3 style="color:var(--text-muted); font-size:12px;">Low Stock</h3>
             <p style="font-size:28px; font-weight:bold; color:${lowStockCount > 0 ? 'var(--danger)' : 'var(--success)'}; margin-top:5px;">${lowStockCount}</p>
         </div>
@@ -339,6 +365,11 @@ function renderReports() {
     if (chartStatus) chartStatus.destroy();
     if (chartCategory) chartCategory.destroy();
     if (chartTrend) chartTrend.destroy();
+
+    // Determine theme colors for charts
+    const isDark = document.body.classList.contains('dark-mode');
+    const textColor = isDark ? '#94A3B8' : '#64748B';
+    const gridColor = isDark ? '#334155' : '#E2E8F0';
 
     // Chart 1: Doughnut (Stock Health)
     const ctxStatus = document.getElementById('statusChart').getContext('2d');
@@ -356,7 +387,12 @@ function renderReports() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } },
+            plugins: { 
+                legend: { 
+                    position: 'bottom',
+                    labels: { color: textColor }
+                } 
+            },
             cutout: '70%'
         }
     });
@@ -379,8 +415,15 @@ function renderReports() {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
-                x: { grid: { display: false } }
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor, borderDash: [5, 5] },
+                    ticks: { color: textColor }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { color: textColor }
+                }
             }
         }
     });
@@ -396,7 +439,6 @@ function renderReports() {
         labels.push(days[d.getDay()]);
     }
 
-    // Very basic aggregation mapping dates to days of the week
     let allHistory = currentRecords.flatMap(r => r.history || []);
     allHistory.forEach(h => {
         const dayIndex = new Date(h.date).getDay();
@@ -405,7 +447,6 @@ function renderReports() {
         if (h.type === 'issued') trendIssuedData[mappedIndex] += h.qty;
     });
 
-    // Fallback demo data if no history exists
     if (allHistory.length === 0) {
         trendReceivedData = [10, 20, 15, 30, 20, 10, 5];
         trendIssuedData = [5, 15, 10, 25, 30, 5, 10];
@@ -438,10 +479,22 @@ function renderReports() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
+            plugins: { 
+                legend: { 
+                    position: 'top',
+                    labels: { color: textColor }
+                } 
+            },
             scales: {
-                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
-                x: { grid: { display: false } }
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor, borderDash: [5, 5] },
+                    ticks: { color: textColor }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { color: textColor }
+                }
             }
         }
     });
