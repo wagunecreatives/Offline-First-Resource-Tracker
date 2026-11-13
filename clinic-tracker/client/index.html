@@ -10,8 +10,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -320,22 +323,77 @@
 
         <!-- REPORTS VIEW -->
         <div id="view-reports" class="view">
-            <section class="panel" style="margin-top:20px;">
-                <div class="panel-header">
-                    <div class="panel-title">
-                        <div class="icon-box teal"><i class="fa-solid fa-chart-simple"></i></div>
-                        <div>
-                            <h2>Reports & Analytics</h2>
-                            <p>Real-time inventory summary</p>
+            <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; margin-bottom: 20px; margin-top:20px;">
+                <!-- TOP LEFT: SUMMARY CARDS -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="icon-box teal"><i class="fa-solid fa-chart-pie"></i></div>
+                            <div>
+                                <h2>Inventory Summary</h2>
+                                <p>Real-time overview of clinic resources</p>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="window.exportCSV()" class="btn-sync" style="background:var(--primary); color: white; border: none;"><i class="fa-solid fa-file-csv"></i> Excel</button>
+                            <button onclick="window.print()" class="btn-sync" style="background:var(--blue); color: white; border: none;"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                         </div>
                     </div>
-                </div>
-                <div class="report-cards" id="report-summary" style="padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;"></div>
-                <div style="padding: 0 20px 20px 20px; display:flex; gap:10px;">
-                    <button onclick="window.exportCSV()" class="btn-sync" style="background:var(--primary);"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
-                    <button onclick="window.print()" class="btn-sync" style="background:var(--blue);"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
-                </div>
-            </section>
+                    <div class="report-cards" id="report-summary" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px;">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- TOP RIGHT: DOUGHNUT CHART -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="icon-box gold"><i class="fa-solid fa-chart-pie"></i></div>
+                            <div>
+                                <h2>Stock Health</h2>
+                                <p>Low vs Healthy stock</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding: 20px; height: 250px; display: flex; justify-content: center;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </section>
+            </div>
+
+            <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                <!-- BOTTOM LEFT: BAR CHART -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="icon-box teal"><i class="fa-solid fa-chart-bar"></i></div>
+                            <div>
+                                <h2>Inventory by Category</h2>
+                                <p>Total units per resource type</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding: 20px; height: 300px;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- BOTTOM RIGHT: LINE CHART -->
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <div class="icon-box lavender" style="background:#F0EBFF; color:#8B5CF6;"><i class="fa-solid fa-chart-line"></i></div>
+                            <div>
+                                <h2>Resource Usage Trends</h2>
+                                <p>Recent stock movements</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding: 20px; height: 300px;">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </section>
+            </div>
         </div>
 
         <!-- SYNC VIEW -->

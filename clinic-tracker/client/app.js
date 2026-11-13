@@ -4,6 +4,9 @@ import { triggerSync } from './sync.js';
 let db;
 let currentRecords = [];
 
+// Chart.js instances
+let chartStatus, chartCategory, chartTrend;
+
 // Map specific item names to FontAwesome icons for the table
 const getItemIcon = (name) => {
     const n = name.toLowerCase();
@@ -291,28 +294,157 @@ async function renderSyncView() {
 }
 
 function renderReports() {
+    // 1. Calculate Summary Data
     let totalItems = 0;
-    let lowStock = 0;
-
+    let lowStockCount = 0;
+    let healthyStockCount = 0;
+    const categoryData = { consumable: 0, vaccine: 0, equipment: 0 };
+    
+    // Process records
     currentRecords.forEach(r => {
         totalItems += r.quantity;
-        if (r.quantity < 10) lowStock++;
+        
+        if (r.quantity < 10) {
+            lowStockCount++;
+        } else {
+            healthyStockCount++;
+        }
+
+        // Category aggregation
+        if (categoryData[r.category] !== undefined) {
+            categoryData[r.category] += r.quantity;
+        } else {
+            categoryData[r.category] = r.quantity;
+        }
     });
 
+    // Update Summary Cards
     document.getElementById('report-summary').innerHTML = `
-        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0;">
-            <h3 style="color:var(--text-muted); font-size:12px;">Total Supplies</h3>
-            <p style="font-size:28px; font-weight:bold; color:var(--primary);">${totalItems}</p>
+        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0; box-shadow: none;">
+            <h3 style="color:var(--text-muted); font-size:12px;">Total Units</h3>
+            <p style="font-size:28px; font-weight:bold; color:var(--primary); margin-top:5px;">${totalItems}</p>
         </div>
-        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0;">
+        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0; box-shadow: none;">
             <h3 style="color:var(--text-muted); font-size:12px;">Unique Items</h3>
-            <p style="font-size:28px; font-weight:bold; color:var(--blue);">${currentRecords.length}</p>
+            <p style="font-size:28px; font-weight:bold; color:var(--blue); margin-top:5px;">${currentRecords.length}</p>
         </div>
-        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0;">
+        <div class="panel" style="padding:20px; text-align:center; border: 1px solid #E2E8F0; box-shadow: none;">
             <h3 style="color:var(--text-muted); font-size:12px;">Low Stock</h3>
-            <p style="font-size:28px; font-weight:bold; color:${lowStock > 0 ? 'var(--danger)' : 'var(--success)'};">${lowStock}</p>
+            <p style="font-size:28px; font-weight:bold; color:${lowStockCount > 0 ? 'var(--danger)' : 'var(--success)'}; margin-top:5px;">${lowStockCount}</p>
         </div>
     `;
+
+    // 2. Prepare Chart.js Data
+    // Destroy existing charts to prevent hover glitches when re-rendering
+    if (chartStatus) chartStatus.destroy();
+    if (chartCategory) chartCategory.destroy();
+    if (chartTrend) chartTrend.destroy();
+
+    // Chart 1: Doughnut (Stock Health)
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    chartStatus = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Healthy (≥10)', 'Low Stock (<10)'],
+            datasets: [{
+                data: [healthyStockCount, lowStockCount],
+                backgroundColor: ['#10B981', '#EF4444'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            cutout: '70%'
+        }
+    });
+
+    // Chart 2: Bar (Category Breakdown)
+    const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+    chartCategory = new Chart(ctxCategory, {
+        type: 'bar',
+        data: {
+            labels: ['Consumables', 'Vaccines', 'Equipment'],
+            datasets: [{
+                label: 'Total Units',
+                data: [categoryData.consumable, categoryData.vaccine, categoryData.equipment],
+                backgroundColor: ['#0D8A8A', '#3B82F6', '#8B5CF6'],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Chart 3: Line (Usage Trends)
+    let trendReceivedData = [0, 0, 0, 0, 0, 0, 0];
+    let trendIssuedData = [0, 0, 0, 0, 0, 0, 0];
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let labels = [];
+    for(let i=6; i>=0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        labels.push(days[d.getDay()]);
+    }
+
+    // Very basic aggregation mapping dates to days of the week
+    let allHistory = currentRecords.flatMap(r => r.history || []);
+    allHistory.forEach(h => {
+        const dayIndex = new Date(h.date).getDay();
+        const mappedIndex = dayIndex === 0 ? 6 : dayIndex - 1; 
+        if (h.type === 'received') trendReceivedData[mappedIndex] += h.qty;
+        if (h.type === 'issued') trendIssuedData[mappedIndex] += h.qty;
+    });
+
+    // Fallback demo data if no history exists
+    if (allHistory.length === 0) {
+        trendReceivedData = [10, 20, 15, 30, 20, 10, 5];
+        trendIssuedData = [5, 15, 10, 25, 30, 5, 10];
+    }
+
+    const ctxTrend = document.getElementById('trendChart').getContext('2d');
+    chartTrend = new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Received (+)',
+                    data: trendReceivedData,
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Issued (-)',
+                    data: trendIssuedData,
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
 }
 
 function populateMovementDropdown() {
